@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: white;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            font-size: 18px; /* 增加基础字体大小 */
+        }
+        .container {
+            max-width: 900px; /* 增加容器宽度以适应更大的字体 */
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 36px; /* 增加标题字体大小 */
+        }
+        .subtitle {
+            color: #666;
+            margin-top: 10px;
+            font-size: 20px; /* 增加副标题字体大小 */
+        }
+        .overall-stats {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px; /* 增加内边距 */
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .overall-stats h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            font-size: 28px; /* 增加二级标题字体大小 */
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px; /* 增加间距 */
+            margin-top: 20px;
+        }
+        .stat-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 20px; /* 增加内边距 */
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 32px; /* 增加统计值字体大小 */
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            font-size: 18px; /* 增加统计标签字体大小 */
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        .positive-rate {
+            font-size: 36px; /* 增加好评率字体大小 */
+            font-weight: bold;
+        }
+        .positive {
+            color: #27ae60;
+        }
+        .negative {
+            color: #e74c3c;
+        }
+        .neutral {
+            color: #f39c12;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 18px; /* 增加表格字体大小 */
+        }
+        th, td {
+            padding: 16px 20px; /* 增加表格单元格内边距 */
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+            color: #333;
+            font-size: 20px; /* 增加表头字体大小 */
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 16px; /* 增加页脚字体大小 */
+            padding: 20px;
+            border-top: 2px solid #eee;
+        }
+        .review-status {
+            font-weight: bold;
+            padding: 6px 12px; /* 增加评价状态内边距 */
+            border-radius: 4px;
+            font-size: 16px; /* 增加评价状态字体大小 */
+        }
+        .status-mixed {
+            background-color: #f39c12;
+            color: white;
+        }
+        .status-positive {
+            background-color: #27ae60;
+            color: white;
+        }
+        .status-negative {
+            background-color: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>战地6 Steam评价统计</h1>
+            <div class="subtitle">基于Steam平台的玩家评价数据分析</div>
+        </div>
+        
+        {% if all_data %}
+        <div class="overall-stats">
+            <h2>总体评价概况</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">{{ all_data.total_reviews }}</div>
+                    <div class="stat-label">总评价数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value positive">{{ all_data.total_positive }}</div>
+                    <div class="stat-label">好评数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value negative">{{ all_data.total_negative }}</div>
+                    <div class="stat-label">差评数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value positive-rate {{ 'positive' if all_data.positive_rate|float > 70 else ('negative' if all_data.positive_rate|float < 40 else 'neutral') }}">
+                        {{ all_data.positive_rate }}
+                    </div>
+                    <div class="stat-label">好评率</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <span class="review-status {{ 'status-mixed' if '褒贬不一' in all_data.review_score_desc_cn else ('status-positive' if '好评' in all_data.review_score_desc_cn else 'status-negative') }}">
+                    {{ all_data.review_score_desc_cn }}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if languages_data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>语言</th>
+                    <th>总评价数</th>
+                    <th>好评数</th>
+                    <th>差评数</th>
+                    <th>好评率</th>
+                    <th>评价状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lang_code, lang_data in languages_data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ lang_data.language_name }}</td>
+                    <td>{{ lang_data.total_reviews }}</td>
+                    <td class="positive">{{ lang_data.total_positive }}</td>
+                    <td class="negative">{{ lang_data.total_negative }}</td>
+                    <td class="{{ 'positive' if lang_data.positive_rate|float > 70 else ('negative' if lang_data.positive_rate|float < 40 else 'neutral') }}">
+                        {{ lang_data.positive_rate }}
+                    </td>
+                    <td>
+                        <span class="review-status {{ 'status-mixed' if '褒贬不一' in lang_data.review_score_desc_cn else ('status-positive' if '好评' in lang_data.review_score_desc_cn else 'status-negative') }}">
+                            {{ lang_data.review_score_desc_cn }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #999;">暂无评价数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        
+        <div class="footer">
+            <p>更新时间：{{ last_update }}</p>
+            <p>数据来源：Steam平台</p>
+            <p>战地风云系列战绩查询机器人</p>
+        </div>
+    </div>
+</body>
+</html>
